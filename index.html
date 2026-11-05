@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lembretes</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#fafaf8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lembretes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{--bg:#fafaf8;--surface:#fff;--card:#fff;--text:#1c1c1a;--muted:#8a8a85;--line:#ebebe6;--accent:#2f6df6;--accent-ink:#fff;--danger:#d64545;--fs:1;--font:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;--pad:14px;--mg:8px;--r:16px;--shadow:0 8px 30px rgba(0,0,0,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:calc(16px*var(--fs))/1.45 var(--font);-webkit-font-smoothing:antialiased;transition:background .2s}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.wrap{max-width:620px;margin:0 auto;padding:28px 20px 120px}
+header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+h1{font-size:30px;letter-spacing:-.02em;margin:0;font-weight:650}
+.sub{color:var(--muted);font-size:14px;margin-top:2px}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--muted);transition:.15s}
+.icon-btn:hover{background:var(--line);color:var(--text)}
+.icon-btn svg{width:20px;height:20px}
+.banner{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:18px;font-size:14px;animation:in .3s}
+.banner span{flex:1;color:var(--muted)}
+.banner button{color:var(--accent);font-weight:600;padding:6px 10px;border-radius:8px}
+.tabs{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:12px;margin-bottom:18px}
+.tab{flex:1;padding:8px;border-radius:9px;font-size:14px;font-weight:550;color:var(--muted);transition:.15s}
+.tab.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.group,.gtitle{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 4px 8px;font-weight:600}
+.item{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--pad) 14px var(--pad) 16px;margin-bottom:var(--mg);animation:in .25s;transition:border-color .15s}
+.item:hover{border-color:var(--muted)}
+.check{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);margin-top:1px;display:grid;place-items:center;transition:.15s}
+.check:hover{border-color:var(--accent)}
+.check svg{width:14px;height:14px;stroke:var(--accent-ink);opacity:0;transition:.15s}
+.item.done .check{background:var(--accent);border-color:var(--accent)}
+.item.done .check svg{opacity:1}
+.body{flex:1;min-width:0;text-align:left}
+.t{font-weight:600;word-break:break-word}
+.d{color:var(--muted);font-size:calc(14px*var(--fs));margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.when{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:calc(12.5px*var(--fs));color:var(--muted)}
+.when.late{color:var(--danger)}
+.item.done .t{text-decoration:line-through;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:70px 20px}
+.empty svg{width:44px;height:44px;opacity:.5;margin-bottom:12px}
+.empty b{display:block;color:var(--text);font-weight:600;margin-bottom:4px}
+.fab{position:fixed;right:max(20px,calc(50% - 290px));bottom:calc(24px + env(safe-area-inset-bottom,0px));height:56px;padding:0 22px 0 18px;border-radius:28px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:var(--shadow);transition:transform .15s}
+.fab:hover{transform:translateY(-2px)}
+.fab svg{width:20px;height:20px}
+dialog{border:0;padding:0;background:var(--bg);max-width:none;max-height:none;width:100%;height:100%;color:var(--text);overflow:hidden}
+.sheet{height:100%;overflow-y:auto;padding-bottom:calc(30px + env(safe-area-inset-bottom,0px));animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.pagebar{position:sticky;top:0;z-index:5;background:var(--bg);display:grid;grid-template-columns:72px 1fr 72px;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px}
+.pagebar h2{margin:0;font-size:17px;font-weight:650;text-align:center}
+.barbtn{color:var(--accent);font-weight:650;padding:8px 12px;border-radius:10px;justify-self:end}
+.barbtn:hover{background:var(--line)}
+.page{max-width:620px;margin:0 auto;padding:0 20px}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+input,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none;transition:.15s}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.bigin{font-size:26px;font-weight:650;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;padding:10px 0}
+.bigin:focus{box-shadow:none;border-color:var(--accent)}
+textarea{resize:none;min-height:130px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chips button{padding:7px 13px;border-radius:999px;background:var(--line);font-size:13.5px;font-weight:550}
+.err{color:var(--danger);font-size:13px;margin-top:10px;min-height:18px}
+.btn{padding:13px;border-radius:12px;font-weight:600;background:var(--line);transition:.15s}
+.btn.mini{padding:9px 16px;flex:none}
+.btn.danger{width:100%;color:var(--danger);margin-top:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.srow{padding:14px 16px;border-top:1px solid var(--line)}.srow:first-child{border-top:0}
+.srow.flex{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.sl{font-weight:550;font-size:15px;margin-bottom:10px}.srow.flex .sl{margin:0}
+.sl b{color:var(--muted);font-weight:500;margin-left:6px}
+.srow small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.seg{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:12px}
+.seg button{flex:1;padding:8px 4px;border-radius:9px;font-size:13.5px;font-weight:550;color:var(--muted);transition:.15s}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.swatches{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:2px}
+.sw{margin:0;padding:0;font-size:0;font-weight:400;letter-spacing:0;text-transform:none;width:34px;height:34px;flex:none;border-radius:50%;transition:.15s;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--text) 18%,transparent);position:relative;display:block}
+.sw:hover{transform:scale(1.08)}
+.sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--text)}
+.sw.custom{background:conic-gradient(#f44,#fc4,#4d4,#4cf,#74f,#f4c,#f44);overflow:hidden}
+.sw.custom input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0;border:0}
+input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--accent);box-shadow:none!important}
+.sample{margin-top:10px;font-size:calc(16px*var(--fs));padding:10px 12px;border-radius:var(--r);background:var(--card);border:1px solid var(--line)}
+.switch{flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:.2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"]::after{transform:translateX(18px)}
+.toasts{position:fixed;left:0;right:0;top:calc(12px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:2147483647;padding:0 16px}
+.toast{pointer-events:auto;background:var(--text);color:var(--bg);border-radius:14px;padding:12px 16px;max-width:420px;width:100%;box-shadow:var(--shadow);animation:in .25s;display:flex;gap:10px;align-items:center}
+.toast b{display:block}.toast small{opacity:.7}
+.toast button{margin-left:auto;font-weight:600;color:inherit;opacity:.8;padding:4px 8px}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Lembretes</h1><div class="sub" id="sub"></div></div>
+    <button class="icon-btn" id="gear" aria-label="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
+  </header>
+  <div id="banner"></div>
+  <div id="extra"></div>
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-tab="open" role="tab">Pendentes</button>
+    <button class="tab" data-tab="done" role="tab">Concluídos</button>
+  </div>
+  <main id="list"></main>
+</div>
+<button class="fab" id="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo</button>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<dialog id="ndlg">
+  <div class="sheet">
+    <div class="pagebar">
+      <button class="icon-btn" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <h2 id="dlgTitle">Novo lembrete</h2>
+      <button class="barbtn" id="save">Salvar</button>
+    </div>
+    <div class="page">
+      <input class="bigin" id="f-title" maxlength="80" placeholder="Título" autocomplete="off" aria-label="Título">
+      <label for="f-desc">Descrição</label>
+      <textarea id="f-desc" maxlength="400" placeholder="Detalhes (opcional)"></textarea>
+      <label for="f-date">Quando</label>
+      <div class="row"><div><input type="date" id="f-date"></div><div><input type="time" id="f-time"></div></div>
+      <div class="chips"><button data-d="0">Hoje</button><button data-d="1">Amanhã</button><button data-d="7">Em 1 semana</button></div>
+      <div class="err" id="err"></div>
+      <button class="btn danger" id="del" hidden>Excluir lembrete</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="sdlg">
+  <div class="sheet">
+    <div class="pagebar">
+      <button class="icon-btn" data-close aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h2>Configurações</h2>
+      <button class="barbtn" data-close>Pronto</button>
+    </div>
+    <div class="page" id="spage"></div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+var KEY='lembretes.v2',SK='lembretes.settings',items=[],tab='open',editing=null;
+var $=function(s){return document.querySelector(s)};
+var OPT={
+ accent:{azul:['#2f6df6','#6c97ff'],verde:['#1f9d6b','#4cc79a'],roxo:['#7c4dff','#a98bff'],laranja:['#e8710a','#ff9d4d'],grafite:['#2b2b2a','#e8e8e4']},
+ bg:{'padrão':['#fafaf8','#121211'],puro:['#ffffff','#000000'],creme:['#f7f1e3','#1b1710'],cinza:['#ececea','#262625'],azul:['#eaf1fe','#0e1526'],verde:['#e9f5ee','#0e1b13'],rosa:['#fbecef','#22121a']},
+ card:{'padrão':['#ffffff','#1b1b1a'],azul:['#e4edff','#18233f'],verde:['#e2f3ea','#15291f'],amarelo:['#fff3cc','#2c2610'],rosa:['#ffe6ec','#331a22'],roxo:['#ece5ff','#241b3d']},
+ text:{'padrão':['#1c1c1a','#f2f2ee'],puro:['#000000','#ffffff'],azul:['#10224a','#cfe0ff'],marrom:['#3b2a1a','#f0dcc6'],verde:['#123524','#c9f0d9'],suave:['#4a4a47','#bdbdb8']}};
+var FONT={sys:'-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif',serif:'Georgia,"Times New Roman",serif',mono:'ui-monospace,Menlo,Consolas,monospace'};
+var DEF={mode:'system',accent:'azul',bg:'padrão',card:'padrão',text:'padrão',fs:100,font:'sys',dens:'cozy',round:'md',desc:true,h24:true,notif:true,lead:0};
+var S=Object.assign({},DEF);
+var UI=[
+ ['Aparência',[['seg','mode','Tema',[['system','Sistema'],['light','Claro'],['dark','Escuro']]],['sw','accent','Cor de destaque'],['sw','bg','Fundo'],['sw','card','Cor dos lembretes'],['sw','text','Cor do texto']]],
+ ['Texto',[['range','fs','Tamanho do texto'],['seg','font','Fonte',[['sys','Padrão'],['serif','Serifada'],['mono','Mono']]]]],
+ ['Lista',[['seg','dens','Espaçamento',[['cozy','Confortável'],['compact','Compacto']]],['seg','round','Cantos',[['sq','Retos'],['md','Suaves'],['lg','Redondos']]],['tog','desc','Mostrar descrições','Exibe os detalhes abaixo do título.'],['tog','h24','Hora em 24 horas','Desligado, usa AM e PM.']]],
+ ['Notificações',[['tog','notif','Notificações do sistema','Usa o som padrão de notificações do celular. O app não toca som próprio.'],['seg','lead','Avisar',[[0,'Na hora'],[5,'5 min antes'],[15,'15 min antes'],[60,'1 h antes']]],['btn','ntest','Testar agora','Envia uma notificação de exemplo.','Testar'],['note','bat','Avisos em segundo plano','Para receber avisos com o app fechado ou em segundo plano, desative a economia de bateria para ele: Configurações do celular, Apps, Lembretes, Bateria, Sem restrições.']]],
+ ['App',[['btn','install','Instalar app','Adicione à tela inicial. Funciona offline.','Instalar'],['note','sto','Seus lembretes ficam salvos','Eles permanecem neste aparelho, mesmo sem internet. Limpar os dados do navegador ou do app apaga tudo.']]],
+ ['Dados',[['btn','clear','Limpar concluídos','Remove todos os lembretes concluídos.','Limpar'],['btn','reset','Restaurar padrões','Volta todas as configurações ao original.','Restaurar']]]];
+
+function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}}
+function loadSettings(){try{var s=JSON.parse(localStorage.getItem(SK)||'{}');Object.keys(DEF).forEach(function(k){if(typeof s[k]!==typeof DEF[k])return;var v=s[k];if(OPT[k]&&v.charAt(0)!=='#'&&!OPT[k][v])return;S[k]=v})}catch(e){}}
+function saveSettings(){try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}}
+function isDark(){return S.mode==='dark'||(S.mode==='system'&&matchMedia('(prefers-color-scheme:dark)').matches)}
+function pair(k){var v=S[k];return v.charAt(0)==='#'?[v,v]:(OPT[k][v]||OPT[k][DEF[k]])}
+function lum(h){var n=parseInt(h.slice(1),16);return(.299*(n>>16&255)+.587*(n>>8&255)+.114*(n&255))/255}
+function applyTheme(){var d=isDark()?1:0,r=document.documentElement,set=function(a,b){r.style.setProperty(a,b)},ac=pair('accent')[d];
+ set('--bg',pair('bg')[d]);set('--card',pair('card')[d]);set('--text',pair('text')[d]);set('--accent',ac);set('--accent-ink',lum(ac)>.5?'#0c1022':'#fff');
+ set('--surface',d?'color-mix(in srgb,var(--bg) 93%,#fff)':'color-mix(in srgb,var(--bg) 35%,#fff)');
+ set('--line','color-mix(in srgb,var(--text) 9%,var(--bg))');set('--muted','color-mix(in srgb,var(--text) 52%,var(--bg))');
+ set('--danger',d?'#ff7a7a':'#d64545');set('--fs',S.fs/100);set('--font',FONT[S.font]||FONT.sys);
+ set('--pad',S.dens==='compact'?'9px':'14px');set('--mg',S.dens==='compact'?'5px':'8px');set('--r',{sq:'6px',md:'16px',lg:'26px'}[S.round]||'16px');
+ r.style.colorScheme=d?'dark':'light';var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.setAttribute('content',pair('bg')[d])}
+try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if(S.mode==='system'){applyTheme();paint()}})}catch(e){}
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pad(n){return String(n).padStart(2,'0')}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function due(i){return new Date(i.date+'T'+(i.time||'09:00')).getTime()}
+function hm(d){return S.h24?pad(d.getHours())+':'+pad(d.getMinutes()):d.toLocaleTimeString('pt-BR',{hour:'numeric',minute:'2-digit',hour12:true})}
+function fmt(i){var d=new Date(due(i)),n=new Date(),diff=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5),t=hm(d);
+ if(diff===0)return'Hoje, '+t;if(diff===1)return'Amanhã, '+t;if(diff===-1)return'Ontem, '+t;
+ return d.toLocaleDateString('pt-BR',{day:'numeric',month:'short',year:d.getFullYear()===n.getFullYear()?undefined:'numeric'})+', '+t}
+var clock='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+function render(){
+ var open=items.filter(function(i){return!i.done}).sort(function(a,b){return due(a)-due(b)});
+ var done=items.filter(function(i){return i.done}).sort(function(a,b){return due(b)-due(a)});
+ $('#sub').textContent=open.length?open.length+(open.length===1?' pendente':' pendentes'):'Tudo em dia';
+ var list=tab==='open'?open:done,h='';
+ if(!list.length){h='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><b>'+(tab==='open'?'Nenhum lembrete':'Nada concluído ainda')+'</b>'+(tab==='open'?'Toque em “Novo” para criar o primeiro.':'Os lembretes que você concluir aparecem aqui.')+'</div>'}
+ else if(tab==='open'){var now=Date.now(),late=list.filter(function(i){return due(i)<now}),rest=list.filter(function(i){return due(i)>=now});
+  if(late.length)h+='<div class="group">Atrasados</div>'+late.map(card).join('');
+  if(rest.length)h+='<div class="group">Próximos</div>'+rest.map(card).join('')}
+ else h=list.map(card).join('');
+ $('#list').innerHTML=h;schedule()}
+function card(i){var late=!i.done&&due(i)<Date.now();
+ return'<div class="item'+(i.done?' done':'')+'" data-id="'+i.id+'"><button class="check" data-act="toggle" aria-label="Concluir"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><button class="body" data-act="edit"><div class="t">'+esc(i.title)+'</div>'+(S.desc&&i.desc?'<div class="d">'+esc(i.desc)+'</div>':'')+'<div class="when'+(late?' late':'')+'">'+clock+fmt(i)+'</div></button></div>'}
+$('#list').addEventListener('click',function(e){var el=e.target.closest('[data-act]');if(!el)return;var it=items.find(function(x){return x.id===el.closest('.item').dataset.id});
+ if(el.dataset.act==='toggle'){it.done=!it.done;persist();render()}else openDlg(it)});
+document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
+function setTab(t){tab=t;document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x.dataset.tab===t)});render()}
+
+var nd=$('#ndlg'),sd=$('#sdlg');
+document.addEventListener('click',function(e){var c=e.target.closest('[data-close]');if(c)c.closest('dialog').close()});
+function openDlg(it){editing=it||null;$('#dlgTitle').textContent=it?'Editar lembrete':'Novo lembrete';$('#del').hidden=!it;$('#err').textContent='';
+ var n=new Date(Date.now()+36e5);
+ $('#f-title').value=it?it.title:'';$('#f-desc').value=it?it.desc:'';
+ $('#f-date').value=it?it.date:ymd(n);$('#f-time').value=it?it.time:pad(n.getHours())+':00';
+ nd.showModal();nd.querySelector('.sheet').scrollTop=0;setTimeout(function(){$('#f-title').focus()},60)}
+$('#add').onclick=function(){openDlg(null)};
+nd.querySelector('.chips').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var d=new Date();d.setDate(d.getDate()+Number(b.dataset.d));$('#f-date').value=ymd(d)});
+$('#save').onclick=save;
+nd.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='f-title'){e.preventDefault();save()}});
+function save(){var t=$('#f-title').value.trim(),d=$('#f-date').value,tm=$('#f-time').value||'09:00';
+ if(!t){$('#err').textContent='Escreva um título.';$('#f-title').focus();return}
+ if(!d){$('#err').textContent='Escolha uma data.';return}
+ var data={title:t,desc:$('#f-desc').value.trim(),date:d,time:tm};
+ if(editing)Object.assign(editing,data,{notified:false,done:false});
+ else items.push(Object.assign({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),done:false,notified:false},data));
+ persist();nd.close();setTab('open');toast('Lembrete salvo',fmt(data))}
+$('#del').onclick=function(){items=items.filter(function(x){return x!==editing});persist();nd.close();render();toast('Lembrete excluído','')};
+
+function toast(a,b,sticky){var el=document.createElement('div');el.className='toast';el.innerHTML='<div><b>'+esc(a)+'</b>'+(b?'<small>'+esc(b)+'</small>':'')+'</div>'+(sticky?'<button>OK</button>':'');
+ var host=document.querySelector('dialog[open]')||document.body;if(host!==document.body){var t=host.querySelector('.toasts');if(!t){t=document.createElement('div');t.className='toasts';host.appendChild(t)}t.appendChild(el)}else $('#toasts').appendChild(el);
+ var rm=function(){el.remove()};if(sticky)el.querySelector('button').onclick=rm;else setTimeout(rm,2600)}
+function sysNotify(t,b,tag){if(!('Notification'in window)||Notification.permission!=='granted')return false;
+ var o={body:b,tag:tag||'lembrete',icon:'icons/icon-192.png',badge:'icons/badge-96.png',data:{url:'./'}};
+ try{if(swReg&&swReg.showNotification){swReg.showNotification(t,o);return true}}catch(e){}
+ try{new Notification(t,o);return true}catch(e){return false}}
+function askPerm(cb){if(!('Notification'in window)){toast('Sem suporte','Este navegador não oferece notificações do sistema.');return}try{var r=Notification.requestPermission();if(r&&r.then)r.then(function(){banner();if(cb)cb()});else{banner();if(cb)cb()}}catch(e){banner()}}
+function banner(){var b=$('#banner');if(!S.notif){b.innerHTML='';return}
+ if(!('Notification'in window)){b.innerHTML='<div class="banner"><span>Este navegador não oferece notificações do sistema. Os avisos aparecerão dentro do app.</span></div>';return}
+ if(Notification.permission==='default')b.innerHTML='<div class="banner"><span>Ative as notificações para ser avisado na hora certa.</span><button id="allow">Ativar</button></div>';
+ else if(Notification.permission==='denied')b.innerHTML='<div class="banner"><span>Notificações bloqueadas. Libere nas configurações do navegador; até lá, avisaremos dentro do app.</span></div>';
+ else b.innerHTML='';
+ var a=$('#allow');if(a)a.onclick=function(){askPerm()}}
+function check(){var now=Date.now(),ch=false,lead=S.lead*6e4;items.forEach(function(i){if(!i.done&&!i.notified&&due(i)-lead<=now){i.notified=true;ch=true;
+ var msg=i.desc||(lead&&due(i)>now?'Em '+(S.lead===60?'1 h':S.lead+' min'):'É hora do seu lembrete');
+ toast(i.title,msg,true);
+ if(S.notif&&(document.hidden||!document.hasFocus()))sysNotify(i.title,msg,i.id)}});
+ if(ch){persist();render()}else schedule()}
+
+/* Configurações */
+function row(r){var t=r[0],k=r[1],l=r[2];
+ if(t==='seg')return'<div class="srow"><div class="sl">'+l+'</div><div class="seg" data-k="'+k+'">'+r[3].map(function(o){return'<button data-v="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div></div>';
+ if(t==='note')return'<div class="srow"><div class="sl">'+l+'</div><small>'+r[3]+'</small></div>';
+ if(t==='sw')return'<div class="srow"><div class="sl">'+l+'</div><div class="swatches" data-k="'+k+'"></div></div>';
+ if(t==='range')return'<div class="srow"><div class="sl">'+l+'<b id="fsv"></b></div><input type="range" data-k="'+k+'" min="85" max="150" step="5" aria-label="'+l+'"><div class="sample">Exemplo de texto do lembrete</div></div>';
+ if(t==='tog')return'<div class="srow flex"><div><div class="sl">'+l+'</div><small>'+r[3]+'</small></div><button class="switch" role="switch" data-k="'+k+'" aria-label="'+l+'"></button></div>';
+ return'<div class="srow flex"><div><div class="sl">'+l+'</div><small>'+r[3]+'</small></div><button class="btn mini" data-act="'+k+'">'+r[4]+'</button></div>'}
+$('#spage').innerHTML=UI.map(function(s){return'<div class="gtitle">'+s[0]+'</div><div class="card">'+s[1].map(row).join('')+'</div>'}).join('');
+function paintSw(el){var k=el.dataset.k,d=isDark()?1:0,cur=S[k],c=cur.charAt(0)==='#',h='';
+ Object.keys(OPT[k]).forEach(function(n){h+='<button class="sw'+(cur===n?' on':'')+'" data-v="'+n+'" aria-label="'+n+'" style="background:'+OPT[k][n][d]+'"></button>'});
+ h+='<label class="sw custom'+(c?' on':'')+'" aria-label="Cor personalizada" style="'+(c?'background:'+cur:'')+'"><input type="color" value="'+(c?cur:OPT[k][DEF[k]][d])+'"></label>';
+ el.innerHTML=h}
+function paint(){document.querySelectorAll('#spage .seg').forEach(function(g){g.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.v===String(S[g.dataset.k]))})});
+ document.querySelectorAll('#spage .swatches').forEach(paintSw);
+ document.querySelectorAll('#spage .switch').forEach(function(b){b.setAttribute('aria-checked',String(!!S[b.dataset.k]))});
+ $('#spage input[type=range]').value=S.fs;$('#fsv').textContent=S.fs+'%'}
+function commit(k){saveSettings();applyTheme();paint();render();
+ if(k==='notif'){banner();extras();if(S.notif&&'Notification'in window&&Notification.permission==='default')askPerm()}}
+function act(a,b){
+ if(a==='install'){doInstall();return}
+ if(a==='ntest'){if(!S.notif){toast('Notificações desativadas','Ative o interruptor para testar.');return}
+  var go=function(){if(!sysNotify('Notificação de teste','Deve tocar o som padrão de notificações do celular.','teste'))toast('Não foi possível enviar','O navegador bloqueou ou não permite notificações aqui. O aviso aparecerá dentro do app.')};
+  if('Notification'in window&&Notification.permission==='default')askPerm(go);else go();return}
+ if(!b.dataset.arm){b.dataset.arm=b.textContent;b.textContent='Confirmar';setTimeout(function(){if(b.dataset.arm){b.textContent=b.dataset.arm;delete b.dataset.arm}},3000);return}
+ b.textContent=b.dataset.arm;delete b.dataset.arm;
+ if(a==='clear'){items=items.filter(function(i){return!i.done});persist();render();toast('Concluídos removidos','')}
+ if(a==='reset'){S=Object.assign({},DEF);saveSettings();applyTheme();paint();banner();extras();render();toast('Configurações restauradas','')}}
+$('#spage').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var g=b.closest('[data-k]'),k=g&&g.dataset.k;
+ if(b.dataset.act){act(b.dataset.act,b);return}
+ if(b.classList.contains('switch')){S[k]=!S[k];commit(k);return}
+ if(b.dataset.v!==undefined){S[k]=k==='lead'?Number(b.dataset.v):b.dataset.v;commit(k)}});
+$('#spage').addEventListener('input',function(e){var t=e.target,g=t.closest('[data-k]'),k=g&&g.dataset.k;
+ if(t.type==='range'){S.fs=Number(t.value);$('#fsv').textContent=S.fs+'%';saveSettings();applyTheme()}
+ else if(t.type==='color'){S[k]=t.value;saveSettings();applyTheme();g.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on')});t.parentNode.classList.add('on');t.parentNode.style.background=t.value}});
+$('#gear').onclick=function(){paint();sd.showModal();sd.querySelector('.sheet').scrollTop=0};
+
+/* PWA */
+var tm=null,swReg=null,deferred=null,DISM='lembretes.dism';
+function schedule(){clearTimeout(tm);var lead=S.lead*6e4,n=Date.now(),next=Infinity;items.forEach(function(i){if(!i.done&&!i.notified){var t=due(i)-lead;if(t>n&&t<next)next=t}});if(next<Infinity)tm=setTimeout(check,Math.min(next-n+200,2147000000))}
+function standalone(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}
+function isIos(){return/iphone|ipad|ipod/i.test(navigator.userAgent)}
+function doInstall(){if(standalone()){toast('O app já está instalado','');return}
+ if(deferred){deferred.prompt();deferred.userChoice.then(function(){deferred=null;extras()});return}
+ toast('Instalar o app',isIos()?'Toque em Compartilhar e depois em “Adicionar à Tela de Início”.':'Abra o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.',true)}
+function refreshInstall(){var b=document.querySelector('[data-act=install]');if(b&&standalone()){b.textContent='Instalado';b.disabled=true;b.style.opacity='.5'}}
+function dismissed(){try{return localStorage.getItem(DISM)==='1'}catch(e){return false}}
+function extras(){var h='';
+ if(deferred&&!standalone())h+='<div class="banner"><span>Instale o app para abrir pela tela inicial e usar offline.</span><button data-x="install">Instalar</button></div>';
+ if(S.notif&&!dismissed())h+='<div class="banner"><span>Para os avisos chegarem com o app em segundo plano, desative a economia de bateria para ele nas configurações do celular.</span><button data-x="ok">Entendi</button></div>';
+ $('#extra').innerHTML=h}
+$('#extra').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.dataset.x==='install')doInstall();if(b.dataset.x==='ok'){try{localStorage.setItem(DISM,'1')}catch(x){}extras()}});
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;extras()});
+window.addEventListener('appinstalled',function(){deferred=null;extras();refreshInstall();toast('App instalado','')});
+if('serviceWorker'in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register('sw.js').then(function(r){swReg=r;return navigator.serviceWorker.ready}).then(function(r){swReg=r}).catch(function(){})}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+loadSettings();applyTheme();load();render();banner();extras();refreshInstall();check();setInterval(check,15000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden){check();render()}});
+})();
+</script>
+</body>
+</html>
